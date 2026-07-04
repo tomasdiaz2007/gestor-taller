@@ -2,6 +2,7 @@ import { ListarOrdenes } from '../../usecases/ListarOrdenes'
 import { CrearOrdenTrabajo } from '../../usecases/CrearOrdenTrabajo'
 import { ObtenerOrden } from '../../usecases/ObtenerOrden'
 import { ActualizarEstadoOrden } from '../../usecases/ActualizarEstadoOrden'
+import { EditarOrdenTrabajo } from '../../usecases/EditarOrdenTrabajo'
 import { AgregarDanio } from '../../usecases/AgregarDanio'
 import { ListarDanios } from '../../usecases/ListarDanios'
 import { AgregarRepuestoAOrden } from '../../usecases/AgregarRepuestoAOrden'
@@ -58,6 +59,23 @@ export function ordenActions(set, get) {
         return actualizada
       } catch (err) {
         logger.error('actualizarEstado', err)
+        set({ error: err.message, loading: false })
+        throw err
+      }
+    },
+
+    editarOrden: async (id, data) => {
+      set({ loading: true, error: null })
+      try {
+        const ordenActualizada = await EditarOrdenTrabajo(id, data)
+        set((state) => ({
+          ordenes: state.ordenes.map((o) => (o.id === id ? ordenActualizada : o)),
+          ordenActual: state.ordenActual?.id === id ? { ...state.ordenActual, ...ordenActualizada } : state.ordenActual,
+          loading: false,
+        }))
+        return ordenActualizada
+      } catch (err) {
+        logger.error('editarOrden', err)
         set({ error: err.message, loading: false })
         throw err
       }

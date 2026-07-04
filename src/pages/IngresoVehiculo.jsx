@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import React, { useState, useEffect } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
 import Card from '../components/common/Card'
 import Button from '../components/common/Button'
 import Input from '../components/common/Input'
@@ -17,11 +17,32 @@ const initialForm = {
 }
 
 export default function IngresoVehiculo() {
+  const { id } = useParams()
+  const isEditing = Boolean(id)
   const navigate = useNavigate()
   const addToast = useToast()
-  const { registrarVehiculo, loading } = useVehiculoStore()
+  const { registrarVehiculo, editarVehiculo, fetchVehiculoActual, vehiculoActual, loading } = useVehiculoStore()
   const [form, setForm] = useState(initialForm)
   const [errors, setErrors] = useState({})
+
+  useEffect(() => {
+    if (isEditing) {
+      fetchVehiculoActual(id)
+    }
+  }, [id, isEditing, fetchVehiculoActual])
+
+  useEffect(() => {
+    if (isEditing && vehiculoActual && vehiculoActual.id === id) {
+      setForm({
+        patente: vehiculoActual.patente,
+        marca: vehiculoActual.marca,
+        modelo: vehiculoActual.modelo,
+        año: vehiculoActual.año,
+        clienteNombre: vehiculoActual.clienteNombre,
+        clienteTelefono: vehiculoActual.clienteTelefono,
+      })
+    }
+  }, [isEditing, vehiculoActual, id])
 
   const handleChange = (field) => (e) => {
     setForm((prev) => ({ ...prev, [field]: e.target.value }))
@@ -31,9 +52,15 @@ export default function IngresoVehiculo() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     try {
-      const vehiculo = await registrarVehiculo(form)
-      addToast(`Vehículo ${vehiculo.patente} registrado correctamente`, 'success')
-      navigate(ROUTES.ORDENES)
+      if (isEditing) {
+        await editarVehiculo(id, form)
+        addToast(`Vehículo ${form.patente} actualizado correctamente`, 'success')
+        navigate(ROUTES.VEHICULOS)
+      } else {
+        const vehiculo = await registrarVehiculo(form)
+        addToast(`Vehículo ${vehiculo.patente} registrado correctamente`, 'success')
+        navigate(ROUTES.VEHICULOS)
+      }
     } catch (err) {
       // Errores de validación: mostrar por campo
       if (err.errors?.length) {
@@ -55,7 +82,9 @@ export default function IngresoVehiculo() {
   return (
     <div className="max-w-2xl mx-auto animate-fade-in">
       <Card>
-        <h2 className="text-lg font-semibold text-slate-100 mb-6">Datos del vehículo</h2>
+        <h2 className="text-lg font-semibold text-slate-100 mb-6">
+          {isEditing ? 'Editar vehículo' : 'Datos del vehículo'}
+        </h2>
         <form onSubmit={handleSubmit} className="space-y-5">
           {/* Datos del vehículo */}
           <div className="grid grid-cols-2 gap-4">
@@ -129,7 +158,7 @@ export default function IngresoVehiculo() {
               Cancelar
             </Button>
             <Button type="submit" loading={loading} id="btn-registrar-vehiculo">
-              Registrar vehículo
+              {isEditing ? 'Guardar cambios' : 'Registrar vehículo'}
             </Button>
           </div>
         </form>

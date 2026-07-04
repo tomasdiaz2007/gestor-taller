@@ -4,7 +4,6 @@ import Card from '../components/common/Card'
 import Button from '../components/common/Button'
 import StatusBadge from '../components/common/StatusBadge'
 import Modal from '../components/common/Modal'
-import Input from '../components/common/Input'
 import { useOrdenStore } from '../store/orden/ordenStore'
 import { useVehiculoStore } from '../store/vehiculo/vehiculoStore'
 import { selectOrdenes } from '../store/orden/ordenSelectors'
@@ -23,26 +22,17 @@ function IconTrash() {
   )
 }
 
-const initialOrdenForm = {
-  vehiculoId: '',
-  problemaInformado: '',
-  diagnostico: '',
-}
-
 export default function ListaOrdenes() {
   const navigate = useNavigate()
   const addToast = useToast()
   const ordenes = useOrdenStore(selectOrdenes)
   const fetchOrdenes = useOrdenStore((s) => s.fetchOrdenes)
-  const crearOrden = useOrdenStore((s) => s.crearOrden)
   const eliminarOrden = useOrdenStore((s) => s.eliminarOrden)
   const loading = useOrdenStore((s) => s.loading)
   const vehiculos = useVehiculoStore(selectVehiculos)
   const fetchVehiculos = useVehiculoStore((s) => s.fetchVehiculos)
 
   const [filtroEstado, setFiltroEstado] = useState('TODOS')
-  const [modalOpen, setModalOpen] = useState(false)
-  const [form, setForm] = useState(initialOrdenForm)
 
   // Modal confirmar eliminación
   const [modalEliminarOpen, setModalEliminarOpen] = useState(false)
@@ -56,18 +46,6 @@ export default function ListaOrdenes() {
   const ordenesFiltradas = filtroEstado === 'TODOS'
     ? ordenes
     : ordenes.filter((o) => o.estadoActual === filtroEstado)
-
-  const handleCrearOrden = async () => {
-    try {
-      const orden = await crearOrden(form)
-      addToast('Orden de trabajo creada', 'success')
-      setModalOpen(false)
-      setForm(initialOrdenForm)
-      navigate(ordenDetalleRoute(orden.id))
-    } catch (err) {
-      addToast(err.message, 'error')
-    }
-  }
 
   const abrirEliminarOrden = (orden) => {
     setOrdenEliminar(orden)
@@ -106,7 +84,7 @@ export default function ListaOrdenes() {
             </button>
           ))}
         </div>
-        <Button onClick={() => setModalOpen(true)} size="sm" id="btn-nueva-orden">
+        <Button onClick={() => navigate('/ordenes/nueva')} size="sm" id="btn-nueva-orden">
           + Nueva orden
         </Button>
       </div>
@@ -180,56 +158,6 @@ export default function ListaOrdenes() {
           </table>
         </div>
       </Card>
-
-      {/* Modal nueva orden */}
-      <Modal
-        isOpen={modalOpen}
-        onClose={() => setModalOpen(false)}
-        title="Nueva Orden de Trabajo"
-        footer={
-          <>
-            <Button variant="ghost" onClick={() => setModalOpen(false)}>Cancelar</Button>
-            <Button onClick={handleCrearOrden} loading={loading} id="btn-confirmar-orden">
-              Crear orden
-            </Button>
-          </>
-        }
-      >
-        <div className="space-y-4">
-          <div className="flex flex-col gap-1">
-            <label className="text-sm font-medium text-slate-300">
-              Vehículo <span className="text-red-400">*</span>
-            </label>
-            <select
-              id="select-vehiculo"
-              value={form.vehiculoId}
-              onChange={(e) => setForm((p) => ({ ...p, vehiculoId: e.target.value }))}
-              className="w-full rounded-lg border border-slate-600 px-3 py-2 text-sm bg-slate-800 text-slate-100 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/30"
-            >
-              <option value="">Seleccionar vehículo...</option>
-              {vehiculos.map((v) => (
-                <option key={v.id} value={v.id}>
-                  {v.patente} — {v.marca} {v.modelo} ({v.clienteNombre})
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="flex flex-col gap-1">
-            <label className="text-sm font-medium text-slate-300">
-              Problema informado <span className="text-red-400">*</span>
-            </label>
-            <textarea
-              id="problema-informado"
-              rows={3}
-              value={form.problemaInformado}
-              onChange={(e) => setForm((p) => ({ ...p, problemaInformado: e.target.value }))}
-              placeholder="Describa el problema reportado por el cliente..."
-              className="w-full rounded-lg border border-slate-600 px-3 py-2 text-sm bg-slate-800 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-blue-500 resize-none"
-            />
-          </div>
-        </div>
-      </Modal>
 
       {/* Modal confirmar eliminación de orden */}
       <Modal
