@@ -1,0 +1,35 @@
+// Estados válidos de una Orden de Trabajo
+export const ESTADOS_ORDEN = {
+  INGRESADO: 'INGRESADO',
+  EN_DIAGNOSTICO: 'EN_DIAGNOSTICO',
+  EN_REPARACION: 'EN_REPARACION',
+  LISTO_PARA_RETIRAR: 'LISTO_PARA_RETIRAR',
+  ENTREGADO: 'ENTREGADO',
+}
+
+// Mapa de transiciones permitidas — no se permiten transiciones inversas
+export const TRANSICIONES_VALIDAS = {
+  [ESTADOS_ORDEN.INGRESADO]: [ESTADOS_ORDEN.EN_DIAGNOSTICO],
+  [ESTADOS_ORDEN.EN_DIAGNOSTICO]: [ESTADOS_ORDEN.EN_REPARACION],
+  [ESTADOS_ORDEN.EN_REPARACION]: [ESTADOS_ORDEN.LISTO_PARA_RETIRAR],
+  [ESTADOS_ORDEN.LISTO_PARA_RETIRAR]: [ESTADOS_ORDEN.ENTREGADO],
+  [ESTADOS_ORDEN.ENTREGADO]: [], // inmutable
+}
+
+// Etiquetas legibles para la UI
+export const ETIQUETAS_ESTADO = {
+  [ESTADOS_ORDEN.INGRESADO]: 'Ingresado',
+  [ESTADOS_ORDEN.EN_DIAGNOSTICO]: 'En Diagnóstico',
+  [ESTADOS_ORDEN.EN_REPARACION]: 'En Reparación',
+  [ESTADOS_ORDEN.LISTO_PARA_RETIRAR]: 'Listo para Retirar',
+  [ESTADOS_ORDEN.ENTREGADO]: 'Entregado',
+}
+
+// Colores Tailwind para cada estado (para StatusBadge)
+export const COLORES_ESTADO = {
+  [ESTADOS_ORDEN.INGRESADO]: 'blue',
+  [ESTADOS_ORDEN.EN_DIAGNOSTICO]: 'yellow',
+  [ESTADOS_ORDEN.EN_REPARACION]: 'orange',
+  [ESTADOS_ORDEN.LISTO_PARA_RETIRAR]: 'green',
+  [ESTADOS_ORDEN.ENTREGADO]: 'gray',
+}
