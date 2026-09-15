@@ -29,7 +29,6 @@ export default function DamageMarker({ danio, svgW, svgH }) {
     <g
       onMouseEnter={() => setShowTooltip(true)}
       onMouseLeave={() => setShowTooltip(false)}
-      style={{ cursor: 'pointer' }}
     >
       {/* Anillo pulsante */}
       <circle cx={cx} cy={cy} r={14} fill={color} opacity={0.15} />

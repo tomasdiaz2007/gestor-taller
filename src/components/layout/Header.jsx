@@ -9,7 +9,7 @@ const pageTitles = {
   [ROUTES.STOCK]: { title: 'Stock', subtitle: 'Inventario de repuestos' },
 }
 
-export default function Header() {
+export default function Header({ onMenuToggle }) {
   const { pathname } = useLocation()
 
   // Detecta si es detalle de orden
@@ -19,18 +19,23 @@ export default function Header() {
     : pageTitles[pathname] ?? { title: 'TallerGest', subtitle: '' }
 
   return (
-    <header className="h-16 flex items-center px-6 border-b border-slate-800 bg-slate-900/80 backdrop-blur-sm sticky top-0 z-30">
-      <div className="flex-1">
-        <h1 className="text-base font-semibold text-slate-100">{pageInfo.title}</h1>
+    <header className="app-header">
+      <button className="menu-toggle" onClick={onMenuToggle} aria-label="Abrir o cerrar menú">
+        <span />
+        <span />
+        <span />
+      </button>
+      <div>
+        <h1>{pageInfo.title}</h1>
         {pageInfo.subtitle && (
-          <p className="text-xs text-slate-500">{pageInfo.subtitle}</p>
+          <p>{pageInfo.subtitle}</p>
         )}
       </div>
 
       {/* Indicador de estado del sistema */}
-      <div className="flex items-center gap-2">
-        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-        <span className="text-xs text-slate-500">Mock</span>
+      <div className="app-status">
+        <span />
+        <span>Mock</span>
       </div>
     </header>
   )

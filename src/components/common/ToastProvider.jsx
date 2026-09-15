@@ -25,7 +25,7 @@ export function ToastProvider({ children }) {
     <ToastContext.Provider value={addToast}>
       {children}
       {/* Portal de toasts — esquina inferior derecha */}
-      <div className="fixed bottom-5 right-5 z-[100] flex flex-col gap-2 min-w-[280px] max-w-sm">
+      <div className="toast-stack">
         {toasts.map((t) => (
           <Toast key={t.id} message={t.message} type={t.type} onClose={() => removeToast(t.id)} />
         ))}

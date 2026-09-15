@@ -66,7 +66,7 @@ export default function Dashboard() {
   ]
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-6 ">
       {/* Métricas */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {stats.map((stat) => (
@@ -84,12 +84,12 @@ export default function Dashboard() {
 
       {/* Órdenes recientes */}
       <div className="grid lg:grid-cols-2 gap-6">
-        <Card padding={false}>
-          <div className="px-5 py-4 border-b border-slate-700">
+        <Card padding={false} className="dashboard-list-card">
+          <div className="dashboard-list-heading">
             <h2 className="font-semibold text-slate-200">Órdenes activas</h2>
           </div>
           {ordenesActivas.length === 0 ? (
-            <p className="px-5 py-8 text-sm text-slate-500 text-center">No hay órdenes activas</p>
+            <p className="dashboard-list-empty">No hay órdenes activas</p>
           ) : (
             <div className="divide-y divide-slate-700/50">
               {ordenesActivas.slice(0, 5).map((orden) => {
@@ -98,7 +98,7 @@ export default function Dashboard() {
                   <div
                     key={orden.id}
                     onClick={() => navigate(ordenDetalleRoute(orden.id))}
-                    className="px-5 py-3 hover:bg-slate-800/50 cursor-pointer transition-colors"
+                    className="dashboard-list-item"
                   >
                     <div className="flex items-center justify-between">
                       <div>
@@ -119,16 +119,16 @@ export default function Dashboard() {
         </Card>
 
         {/* Repuestos sin stock */}
-        <Card padding={false}>
-          <div className="px-5 py-4 border-b border-slate-700">
+        <Card padding={false} className="dashboard-list-card">
+          <div className="dashboard-list-heading">
             <h2 className="font-semibold text-slate-200">Repuestos sin stock</h2>
           </div>
           {repuestosSinStock.length === 0 ? (
-            <p className="px-5 py-8 text-sm text-slate-500 text-center">✅ Todo el stock en orden</p>
+            <p className="dashboard-list-empty">✅ Todo el stock en orden</p>
           ) : (
             <div className="divide-y divide-slate-700/50">
               {repuestosSinStock.map((r) => (
-                <div key={r.id} className="px-5 py-3 flex items-center justify-between">
+                <div key={r.id} className="dashboard-list-item flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-red-400">{r.nombre}</p>
                     <p className="text-xs text-slate-500">{r.codigo}</p>

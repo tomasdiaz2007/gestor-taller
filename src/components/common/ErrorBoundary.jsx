@@ -21,43 +21,15 @@ export default class ErrorBoundary extends React.Component {
   render() {
     if (this.state.hasError) {
       return (
-        <div style={{
-          minHeight: '100vh',
-          background: '#0f172a',
-          color: '#f1f5f9',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: '2rem',
-          fontFamily: 'monospace',
-        }}>
-          <h1 style={{ color: '#ef4444', marginBottom: '1rem' }}>Error de renderizado</h1>
-          <pre style={{
-            background: '#1e293b',
-            padding: '1rem',
-            borderRadius: '8px',
-            maxWidth: '800px',
-            width: '100%',
-            overflow: 'auto',
-            fontSize: '14px',
-            color: '#fca5a5',
-          }}>
+        <div>
+          <h1>Error de renderizado</h1>
+          <pre>
             {this.state.error?.toString()}
             {'\n\n'}
             {this.state.error?.stack}
           </pre>
           <button
             onClick={() => this.setState({ hasError: false, error: null })}
-            style={{
-              marginTop: '1rem',
-              padding: '0.5rem 1.5rem',
-              background: '#2563eb',
-              color: 'white',
-              border: 'none',
-              borderRadius: '8px',
-              cursor: 'pointer',
-            }}
           >
             Reintentar
           </button>

@@ -1,18 +1,10 @@
-import React, { useState, useRef } from 'react'
-import { VISTAS_VEHICULO, TIPOS_DANIO } from '../../config/constants'
+import React, { useRef } from 'react'
+import { VISTAS_VEHICULO } from '../../config/constants'
 import { FronteVehiculo, TraseraVehiculo, LateralVehiculo } from '../../assets/svg/vehiculoSVGs'
 import DamageMarker from './DamageMarker'
-import DamagePopup from './DamagePopup'
 
 const SVG_W = 460
 const SVG_H = 320
-
-const VIEW_LABELS = {
-  [VISTAS_VEHICULO.FRENTE]: 'Frente',
-  [VISTAS_VEHICULO.TRASERA]: 'Trasera',
-  [VISTAS_VEHICULO.LATERAL_IZQUIERDO]: 'Lateral Izq.',
-  [VISTAS_VEHICULO.LATERAL_DERECHO]: 'Lateral Der.',
-}
 
 /**
  * Renderiza la carrocería SVG correspondiente a la vista activa.
@@ -60,13 +52,11 @@ export default function VehicleView({ vista, danios, onClickSVG, readonly }) {
   }
 
   return (
-    <div className="relative w-full">
+    <div>
       <svg
         ref={svgRef}
         viewBox={`0 0 ${SVG_W} ${SVG_H}`}
-        className={`w-full h-auto rounded-xl border border-slate-700 bg-slate-900/80 ${!readonly ? 'cursor-crosshair' : ''}`}
         onClick={handleClick}
-        style={{ userSelect: 'none' }}
       >
         <VehicleBody vista={vista} />
         {/* Marcadores de daños */}
@@ -80,7 +70,7 @@ export default function VehicleView({ vista, danios, onClickSVG, readonly }) {
         ))}
       </svg>
       {!readonly && (
-        <p className="text-xs text-slate-600 mt-1.5 text-center">
+        <p>
           Hacé clic sobre el diagrama para registrar un daño
         </p>
       )}

@@ -12,22 +12,12 @@ const initialForm = { codigo: '', nombre: '', stockActual: '', precio: '' }
 
 // Icono editar
 function IconEdit() {
-  return (
-    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-    </svg>
-  )
+  return <span className="action-icon" aria-hidden="true">✎</span>
 }
 
 // Icono eliminar
 function IconTrash() {
-  return (
-    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-    </svg>
-  )
+  return <span className="action-icon" aria-hidden="true">🗑</span>
 }
 
 export default function Stock() {
@@ -118,23 +108,28 @@ export default function Stock() {
   return (
     <div className="space-y-5 animate-fade-in">
       {/* Toolbar */}
-      <div className="flex items-center gap-4">
-        <div className="flex-1 relative">
-          <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
-          <input
-            id="search-repuesto"
-            type="text"
-            placeholder="Buscar por nombre o código..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-9 pr-3 py-2 rounded-lg border border-slate-600 bg-slate-800 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-blue-500"
-          />
+      <div className="stock-toolbar">
+        <div className="stock-toolbar-actions">
+          <Button onClick={() => setModalCrearOpen(true)} size="sm" id="btn-nuevo-repuesto">
+            + Nuevo repuesto
+          </Button>
         </div>
-        <Button onClick={() => setModalCrearOpen(true)} size="sm" id="btn-nuevo-repuesto">
-          + Nuevo repuesto
-        </Button>
+        <div className="stock-search-row">
+          <div className="stock-search">
+            <input
+              id="search-repuesto"
+              type="text"
+              placeholder="Buscar por nombre o código..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
+          <span className="search-icon" aria-hidden="true">
+            <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </span>
+        </div>
       </div>
 
       {/* Tabla */}
@@ -172,11 +167,6 @@ export default function Stock() {
                       }`}>
                         {r.stockActual}
                       </span>
-                      {r.stockActual === 0 && (
-                        <span className="ml-2 text-xs bg-red-900/40 text-red-400 border border-red-800 px-1.5 py-0.5 rounded-full">
-                          Sin stock
-                        </span>
-                      )}
                     </td>
                     <td className="text-slate-300">{formatPrecio(r.precio)}</td>
                     <td>
@@ -185,7 +175,7 @@ export default function Stock() {
                           id={`btn-editar-repuesto-${r.id}`}
                           onClick={() => abrirEditar(r)}
                           title="Editar repuesto"
-                          className="p-1.5 rounded-md text-slate-400 hover:text-blue-400 hover:bg-blue-500/10 transition-colors"
+                          className="action-button"
                         >
                           <IconEdit />
                         </button>
@@ -193,7 +183,7 @@ export default function Stock() {
                           id={`btn-eliminar-repuesto-${r.id}`}
                           onClick={() => abrirEliminar(r)}
                           title="Eliminar repuesto"
-                          className="p-1.5 rounded-md text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+                          className="action-button action-button--danger"
                         >
                           <IconTrash />
                         </button>
