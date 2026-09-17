@@ -68,8 +68,8 @@ export default function Vehiculos() {
         ) : filteredVehiculos.length === 0 ? (
           <div className="p-8 text-center text-slate-500">No se encontraron vehículos.</div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="table-base w-full text-left">
+          <div className="table-scroll-wrap">
+            <table className="table-base table--vehiculos w-full text-left">
               <thead>
                 <tr>
                   <th>Patente</th>

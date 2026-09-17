@@ -273,9 +273,9 @@ export default function OrdenTrabajo() {
                         <td className="font-mono text-slate-400">{ru.repuesto?.codigo}</td>
                         <td>{ru.repuesto?.nombre}</td>
                         <td className="font-mono">{ru.cantidad}</td>
-                        <td className="text-slate-400">{formatPrecio(ru.repuesto?.precio ?? 0)}</td>
+                        <td className="text-slate-400">{formatPrecio(ru.repuesto?.precioVenta ?? ru.repuesto?.precio ?? 0)}</td>
                         <td className="font-semibold text-slate-200 text-right">
-                          {formatPrecio((ru.repuesto?.precio ?? 0) * ru.cantidad)}
+                          {formatPrecio((ru.repuesto?.precioVenta ?? ru.repuesto?.precio ?? 0) * ru.cantidad)}
                         </td>
                       </tr>
                     ))}
@@ -313,7 +313,7 @@ export default function OrdenTrabajo() {
               <option value="">Seleccionar repuesto...</option>
               {repuestos.map((r) => (
                 <option key={r.id} value={r.id} disabled={r.stockActual === 0}>
-                  {r.nombre} ({r.codigo}) — Stock: {r.stockActual}
+                  {r.nombre} ({r.codigo}) — Stock: {r.stockActual} — {formatPrecio(r.precioVenta ?? r.precio)}
                 </option>
               ))}
             </select>

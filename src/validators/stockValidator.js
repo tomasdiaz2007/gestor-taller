@@ -36,7 +36,11 @@ export function validateRepuesto(data) {
   if (!data.nombre?.trim()) errors.push('El nombre es obligatorio')
   if (isNaN(Number(data.stockActual)) || Number(data.stockActual) < 0)
     errors.push('El stock no puede ser negativo')
-  if (isNaN(Number(data.precio)) || Number(data.precio) < 0)
-    errors.push('El precio no puede ser negativo')
+  const pLista = Number(data.precioLista ?? data.precio)
+  if (isNaN(pLista) || pLista < 0)
+    errors.push('El precio de lista no puede ser negativo')
+  const pVenta = Number(data.precioVenta ?? data.precio)
+  if (isNaN(pVenta) || pVenta < 0)
+    errors.push('El precio de venta no puede ser negativo')
   return { valid: errors.length === 0, errors }
 }

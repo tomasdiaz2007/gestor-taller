@@ -103,8 +103,8 @@ export default function ListaOrdenes() {
 
       {/* Tabla */}
       <Card padding={false}>
-        <div className="overflow-x-auto">
-          <table className="table-base">
+        <div className="table-scroll-wrap">
+          <table className="table-base table--ordenes">
             <thead>
               <tr>
                 <th>Vehículo</th>

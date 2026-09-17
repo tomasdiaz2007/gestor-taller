@@ -44,7 +44,22 @@ export const stockRepository = {
     if (index === -1) throw new NotFoundError('Repuesto', id)
     const repuesto = repuestos[index]
     if (repuesto.stockActual < cantidad) throw new StockError(repuesto.nombre, repuesto.stockActual, cantidad)
-    const actualizado = { ...repuesto, stockActual: repuesto.stockActual - cantidad }
+    const actualizado = createRepuesto({ ...repuesto, stockActual: repuesto.stockActual - cantidad })
+    repuestos[index] = actualizado
+    writeCollection(COLLECTION, repuestos)
+    return { ...actualizado }
+  },
+
+  async ajustarStock(id, delta) {
+    const repuestos = readCollection(COLLECTION)
+    const index = repuestos.findIndex((item) => item.id === id)
+    if (index === -1) throw new NotFoundError('Repuesto', id)
+    const repuesto = repuestos[index]
+    const nuevoStock = Number(repuesto.stockActual) + delta
+    if (nuevoStock < 0) {
+      throw new Error('El stock no puede ser negativo')
+    }
+    const actualizado = createRepuesto({ ...repuesto, stockActual: nuevoStock })
     repuestos[index] = actualizado
     writeCollection(COLLECTION, repuestos)
     return { ...actualizado }

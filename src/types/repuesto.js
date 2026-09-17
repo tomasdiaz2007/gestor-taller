@@ -4,7 +4,9 @@
  * @property {string} codigo
  * @property {string} nombre
  * @property {number} stockActual
- * @property {number} precio
+ * @property {number} precioLista
+ * @property {number} precioVenta
+ * @property {number} [precio]
  */
 
 /**

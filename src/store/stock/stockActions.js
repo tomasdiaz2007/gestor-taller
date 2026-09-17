@@ -2,6 +2,7 @@ import { ListarRepuestos } from '../../usecases/ListarRepuestos'
 import { AgregarRepuesto } from '../../usecases/AgregarRepuesto'
 import { EditarRepuesto } from '../../usecases/EditarRepuesto'
 import { EliminarRepuesto } from '../../usecases/EliminarRepuesto'
+import { AjustarStock } from '../../usecases/AjustarStock'
 import { logger } from '../../logger/logger'
 
 export function stockActions(set, get) {
@@ -56,6 +57,22 @@ export function stockActions(set, get) {
         }))
       } catch (err) {
         logger.error('eliminarRepuesto', err)
+        set({ error: err.message, loading: false })
+        throw err
+      }
+    },
+
+    ajustarStock: async (id, delta) => {
+      set({ loading: true, error: null })
+      try {
+        const repuesto = await AjustarStock(id, delta)
+        set((state) => ({
+          repuestos: state.repuestos.map((r) => (r.id === id ? repuesto : r)),
+          loading: false,
+        }))
+        return repuesto
+      } catch (err) {
+        logger.error('ajustarStock', err)
         set({ error: err.message, loading: false })
         throw err
       }

@@ -6,7 +6,7 @@ import StatusBadge from '../components/common/StatusBadge'
 import { useVehiculoStore } from '../store/vehiculo/vehiculoStore'
 import { useOrdenStore } from '../store/orden/ordenStore'
 import { ROUTES } from '../config/routes'
-import { formatFecha } from '../helpers/dateHelper'
+import { formatFecha, calcularDiasEnTaller } from '../helpers/dateHelper'
 import { formatIdCorto } from '../helpers/formatHelper'
 import { ListarDaniosPorVehiculo } from '../usecases/ListarDaniosPorVehiculo'
 
@@ -117,12 +117,13 @@ export default function DetalleVehiculo() {
             ) : ordenesVehiculo.length === 0 ? (
               <p className="text-slate-500 text-sm py-4">No hay órdenes de trabajo para este vehículo.</p>
             ) : (
-              <div className="overflow-x-auto">
-                <table className="table-base w-full text-left">
+              <div className="table-scroll-wrap">
+                <table className="table-base table--detalle-ot w-full text-left">
                   <thead>
                     <tr>
-                      <th>ID</th>
-                      <th>Fecha Ingreso</th>
+                      <th>Vehículo / ID</th>
+                      <th>Ingreso</th>
+                      <th>Días</th>
                       <th>Estado</th>
                       <th>Problema</th>
                       <th className="text-right">Acción</th>
@@ -133,6 +134,7 @@ export default function DetalleVehiculo() {
                       <tr key={o.id} className="hover:bg-slate-800/50">
                         <td className="font-mono text-slate-400" title={o.id}>#{formatIdCorto(o.id)}</td>
                         <td>{formatFecha(o.fechaIngreso)}</td>
+                        <td className="font-mono text-slate-300">{calcularDiasEnTaller(o.fechaIngreso)}d</td>
                         <td><StatusBadge estado={o.estadoActual} size="sm" /></td>
                         <td className="truncate max-w-xs">{o.problemaInformado || '—'}</td>
                         <td className="text-right">

@@ -8,7 +8,7 @@ import { selectRepuestos } from '../store/stock/stockSelectors'
 import { useToast } from '../components/common/ToastProvider'
 import { formatPrecio } from '../helpers/formatHelper'
 
-const initialForm = { codigo: '', nombre: '', stockActual: '', precio: '' }
+const initialForm = { codigo: '', nombre: '', stockActual: '', precioLista: '', precioVenta: '' }
 
 // Icono editar
 function IconEdit() {
@@ -23,7 +23,7 @@ function IconTrash() {
 export default function Stock() {
   const addToast = useToast()
   const repuestos = useStockStore(selectRepuestos)
-  const { fetchRepuestos, agregarRepuesto, editarRepuesto, eliminarRepuesto, loading } = useStockStore()
+  const { fetchRepuestos, agregarRepuesto, editarRepuesto, eliminarRepuesto, ajustarStock, loading } = useStockStore()
 
   const [search, setSearch] = useState('')
 
@@ -47,6 +47,17 @@ export default function Stock() {
     r.codigo.toLowerCase().includes(search.toLowerCase())
   )
 
+  // ── Ajustar Stock (+ / -) ──────────────────────────────────────────────────
+  const handleAjustarStock = async (id, delta) => {
+    try {
+      await ajustarStock(id, delta)
+      const msj = delta > 0 ? 'Stock incrementado' : 'Stock decrementado'
+      addToast(msj, 'success')
+    } catch (err) {
+      addToast(err.message, 'error')
+    }
+  }
+
   // ── Crear ──────────────────────────────────────────────────────────────────
   const handleChangeCrear = (field) => (e) =>
     setFormCrear((p) => ({ ...p, [field]: e.target.value }))
@@ -69,7 +80,8 @@ export default function Stock() {
       codigo: repuesto.codigo,
       nombre: repuesto.nombre,
       stockActual: String(repuesto.stockActual),
-      precio: String(repuesto.precio),
+      precioLista: String(repuesto.precioLista ?? repuesto.precio ?? 0),
+      precioVenta: String(repuesto.precioVenta ?? repuesto.precio ?? 0),
     })
     setModalEditarOpen(true)
   }
@@ -126,7 +138,7 @@ export default function Stock() {
           </div>
           <span className="search-icon" aria-hidden="true">
             <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
           </span>
         </div>
@@ -134,21 +146,22 @@ export default function Stock() {
 
       {/* Tabla */}
       <Card padding={false}>
-        <div className="overflow-x-auto">
-          <table className="table-base">
+        <div className="table-scroll-wrap">
+          <table className="table-base table--stock">
             <thead>
               <tr>
                 <th>Código</th>
                 <th>Nombre</th>
                 <th>Stock</th>
-                <th>Precio</th>
+                <th>Precio Lista</th>
+                <th>Precio Venta</th>
                 <th>Acciones</th>
               </tr>
             </thead>
             <tbody>
               {repuestosFiltrados.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="text-center py-10 text-slate-500">
+                  <td colSpan={6} className="text-center py-10 text-slate-500">
                     No se encontraron repuestos
                   </td>
                 </tr>
@@ -158,17 +171,38 @@ export default function Stock() {
                     <td className="font-mono text-slate-400 text-xs">{r.codigo}</td>
                     <td className="text-slate-200 font-medium">{r.nombre}</td>
                     <td>
-                      <span className={`font-mono font-semibold ${
-                        r.stockActual === 0
-                          ? 'text-red-400'
-                          : r.stockActual < 3
-                          ? 'text-amber-400'
-                          : 'text-emerald-400'
-                      }`}>
-                        {r.stockActual}
-                      </span>
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          id={`btn-restar-stock-${r.id}`}
+                          onClick={() => handleAjustarStock(r.id, -1)}
+                          disabled={r.stockActual <= 0 || loading}
+                          title="Restar 1 al stock"
+                          className="stock-adj-btn"
+                        >
+                          -
+                        </button>
+                        <span className={`font-mono font-semibold min-w-[2rem] text-center ${
+                          r.stockActual === 0
+                            ? 'text-red-400'
+                            : r.stockActual < 3
+                            ? 'text-amber-400'
+                            : 'text-emerald-400'
+                        }`}>
+                          {r.stockActual}
+                        </span>
+                        <button
+                          id={`btn-sumar-stock-${r.id}`}
+                          onClick={() => handleAjustarStock(r.id, 1)}
+                          disabled={loading}
+                          title="Sumar 1 al stock"
+                          className="stock-adj-btn"
+                        >
+                          +
+                        </button>
+                      </div>
                     </td>
-                    <td className="text-slate-300">{formatPrecio(r.precio)}</td>
+                    <td className="text-slate-300">{formatPrecio(r.precioLista ?? r.precio)}</td>
+                    <td className="text-slate-300">{formatPrecio(r.precioVenta ?? r.precio)}</td>
                     <td>
                       <div className="flex items-center gap-1">
                         <button
@@ -216,7 +250,8 @@ export default function Stock() {
             <Input id="codigo" label="Código" placeholder="FILT-001" value={formCrear.codigo} onChange={handleChangeCrear('codigo')} required />
             <Input id="stockInicial" label="Stock inicial" type="number" placeholder="10" value={formCrear.stockActual} onChange={handleChangeCrear('stockActual')} required />
             <Input id="nombreRepuesto" label="Nombre" placeholder="Filtro de aceite" value={formCrear.nombre} onChange={handleChangeCrear('nombre')} required className="col-span-2" />
-            <Input id="precio" label="Precio (ARS)" type="number" placeholder="1200" value={formCrear.precio} onChange={handleChangeCrear('precio')} required />
+            <Input id="precioLista" label="Precio de Lista (ARS)" type="number" placeholder="1000" value={formCrear.precioLista} onChange={handleChangeCrear('precioLista')} required />
+            <Input id="precioVenta" label="Precio de Venta (ARS)" type="number" placeholder="1200" value={formCrear.precioVenta} onChange={handleChangeCrear('precioVenta')} required />
           </div>
         </div>
       </Modal>
@@ -240,7 +275,8 @@ export default function Stock() {
             <Input id="edit-codigo" label="Código" placeholder="FILT-001" value={formEditar.codigo} onChange={handleChangeEditar('codigo')} required />
             <Input id="edit-stock" label="Stock actual" type="number" placeholder="10" value={formEditar.stockActual} onChange={handleChangeEditar('stockActual')} required />
             <Input id="edit-nombre" label="Nombre" placeholder="Filtro de aceite" value={formEditar.nombre} onChange={handleChangeEditar('nombre')} required className="col-span-2" />
-            <Input id="edit-precio" label="Precio (ARS)" type="number" placeholder="1200" value={formEditar.precio} onChange={handleChangeEditar('precio')} required />
+            <Input id="edit-precioLista" label="Precio de Lista (ARS)" type="number" placeholder="1000" value={formEditar.precioLista} onChange={handleChangeEditar('precioLista')} required />
+            <Input id="edit-precioVenta" label="Precio de Venta (ARS)" type="number" placeholder="1200" value={formEditar.precioVenta} onChange={handleChangeEditar('precioVenta')} required />
           </div>
         </div>
       </Modal>
