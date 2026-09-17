@@ -28,6 +28,7 @@ export default function ListaOrdenes() {
   const fetchVehiculos = useVehiculoStore((s) => s.fetchVehiculos)
 
   const [filtroEstado, setFiltroEstado] = useState('TODOS')
+  const [search, setSearch] = useState('')
 
   // Modal confirmar eliminación
   const [modalEliminarOpen, setModalEliminarOpen] = useState(false)
@@ -38,9 +39,16 @@ export default function ListaOrdenes() {
     fetchVehiculos()
   }, [fetchOrdenes, fetchVehiculos])
 
-  const ordenesFiltradas = filtroEstado === 'TODOS'
-    ? ordenes
-    : ordenes.filter((o) => o.estadoActual === filtroEstado)
+  const ordenesFiltradas = ordenes.filter((o) => {
+    if (filtroEstado !== 'TODOS' && o.estadoActual !== filtroEstado) return false
+    const term = search.trim().toLowerCase()
+    if (!term) return true
+    const v = vehiculos.find((veh) => veh.id === o.vehiculoId)
+    const texto = [
+      v?.patente, v?.marca, v?.modelo, v?.clienteNombre, o.problemaInformado,
+    ].filter(Boolean).join(' ').toLowerCase()
+    return texto.includes(term)
+  })
 
   const abrirEliminarOrden = (orden) => {
     setOrdenEliminar(orden)
@@ -63,8 +71,20 @@ export default function ListaOrdenes() {
   return (
     <div className="space-y-5 animate-fade-in">
       {/* Toolbar */}
-      <div className="flex items-center justify-between gap-4">
-        <div className="flex items-center gap-2 overflow-x-auto pb-1">
+      <div className="ordenes-toolbar">
+        <div className="ordenes-toolbar-main">
+          <input
+            id="search-orden"
+            type="text"
+            placeholder="Buscar por patente, marca, cliente o problema..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+          <Button onClick={() => navigate('/ordenes/nueva')} size="sm" id="btn-nueva-orden">
+            + Nueva orden
+          </Button>
+        </div>
+        <div className="filter-chips">
           {estadosFiltro.map((estado) => (
             <button
               key={estado}
@@ -79,9 +99,6 @@ export default function ListaOrdenes() {
             </button>
           ))}
         </div>
-        <Button onClick={() => navigate('/ordenes/nueva')} size="sm" id="btn-nueva-orden">
-          + Nueva orden
-        </Button>
       </div>
 
       {/* Tabla */}

@@ -1,82 +1,54 @@
-import { ordenesMock } from '../mock/ordenes'
 import { createOrdenTrabajo } from '../models/OrdenTrabajo'
-import { NotFoundError } from '../errors/NotFoundError'
-import { repuestosUsadosMock } from '../mock/repuestos'
 import { createRepuestoUsado } from '../models/RepuestoUsado'
+import { NotFoundError } from '../errors/NotFoundError'
+import { createId, readCollection, writeCollection } from './localStorage'
 
-let _ordenes = ordenesMock.map(createOrdenTrabajo)
-let _nextId = _ordenes.length + 1
-let _repuestosUsados = [...repuestosUsadosMock]
-let _nextRuId = _repuestosUsados.length + 1
+const ORDERS = 'ordenes'
+const USED_PARTS = 'repuestos-usados'
 
-/**
- * CONTRACT:
- * getAll() | getById(id) | create(data) | update(id, data) | delete(id)
- * + getRepuestosUsados(ordenId) | addRepuestoUsado(data)
- */
 export const ordenRepository = {
-  /** @returns {Promise<import('../types/orden').OrdenTrabajo[]>} */
   async getAll() {
-    return [..._ordenes]
+    return readCollection(ORDERS).map((orden) => ({ ...orden }))
   },
 
-  /**
-   * @param {string} id
-   * @returns {Promise<import('../types/orden').OrdenTrabajo>}
-   */
   async getById(id) {
-    const orden = _ordenes.find((o) => o.id === id)
+    const orden = readCollection(ORDERS).find((item) => item.id === id)
     if (!orden) throw new NotFoundError('OrdenTrabajo', id)
     return { ...orden }
   },
 
-  /**
-   * @param {Object} data
-   * @returns {Promise<import('../types/orden').OrdenTrabajo>}
-   */
   async create(data) {
-    const orden = createOrdenTrabajo({ ...data, id: `o${_nextId++}` })
-    _ordenes.push(orden)
+    const orden = createOrdenTrabajo({ ...data, id: createId('orden') })
+    writeCollection(ORDERS, [...readCollection(ORDERS), orden])
     return { ...orden }
   },
 
-  /**
-   * @param {string} id
-   * @param {Partial<import('../types/orden').OrdenTrabajo>} data
-   * @returns {Promise<import('../types/orden').OrdenTrabajo>}
-   */
   async update(id, data) {
-    const index = _ordenes.findIndex((o) => o.id === id)
+    const ordenes = readCollection(ORDERS)
+    const index = ordenes.findIndex((item) => item.id === id)
     if (index === -1) throw new NotFoundError('OrdenTrabajo', id)
-    _ordenes[index] = createOrdenTrabajo({ ..._ordenes[index], ...data, id })
-    return { ..._ordenes[index] }
+    const actualizada = createOrdenTrabajo({ ...ordenes[index], ...data, id })
+    ordenes[index] = actualizada
+    writeCollection(ORDERS, ordenes)
+    return { ...actualizada }
   },
 
-  /**
-   * @param {string} id
-   * @returns {Promise<void>}
-   */
   async delete(id) {
-    const index = _ordenes.findIndex((o) => o.id === id)
-    if (index === -1) throw new NotFoundError('OrdenTrabajo', id)
-    _ordenes.splice(index, 1)
+    const ordenes = readCollection(ORDERS)
+    if (!ordenes.some((item) => item.id === id)) throw new NotFoundError('OrdenTrabajo', id)
+    writeCollection(ORDERS, ordenes.filter((item) => item.id !== id))
+    writeCollection(USED_PARTS, readCollection(USED_PARTS).filter((item) => item.ordenTrabajoId !== id))
   },
 
-  /**
-   * @param {string} ordenId
-   * @returns {Promise<import('../types/repuesto').RepuestoUsado[]>}
-   */
   async getRepuestosUsados(ordenId) {
-    return _repuestosUsados.filter((ru) => ru.ordenTrabajoId === ordenId)
+    return readCollection(USED_PARTS)
+      .filter((item) => item.ordenTrabajoId === ordenId)
+      .map((item) => ({ ...item }))
   },
 
-  /**
-   * @param {Object} data
-   * @returns {Promise<import('../types/repuesto').RepuestoUsado>}
-   */
   async addRepuestoUsado(data) {
-    const ru = createRepuestoUsado({ ...data, id: `ru${_nextRuId++}` })
-    _repuestosUsados.push(ru)
-    return { ...ru }
+    const repuestoUsado = createRepuestoUsado({ ...data, id: createId('repuesto-usado') })
+    writeCollection(USED_PARTS, [...readCollection(USED_PARTS), repuestoUsado])
+    return { ...repuestoUsado }
   },
 }

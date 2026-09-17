@@ -110,7 +110,7 @@ export default function IngresoVehiculo() {
             <Input
               id="marca"
               label="Marca"
-              placeholder="Toyota"
+              placeholder="Marca del vehículo"
               value={form.marca}
               onChange={handleChange('marca')}
               error={errors.marca}
@@ -119,7 +119,7 @@ export default function IngresoVehiculo() {
             <Input
               id="modelo"
               label="Modelo"
-              placeholder="Corolla"
+              placeholder="Modelo del vehículo"
               value={form.modelo}
               onChange={handleChange('modelo')}
               error={errors.modelo}
@@ -135,7 +135,7 @@ export default function IngresoVehiculo() {
             <Input
               id="clienteNombre"
               label="Nombre"
-              placeholder="Juan Pérez"
+              placeholder="Nombre del cliente"
               value={form.clienteNombre}
               onChange={handleChange('clienteNombre')}
               error={errors.clienteNombre}
@@ -145,7 +145,7 @@ export default function IngresoVehiculo() {
               id="clienteTelefono"
               label="Teléfono"
               type="tel"
-              placeholder="11-4567-8901"
+              placeholder="12-3456-7890"
               value={form.clienteTelefono}
               onChange={handleChange('clienteTelefono')}
               error={errors.clienteTelefono}

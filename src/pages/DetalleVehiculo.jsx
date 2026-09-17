@@ -7,6 +7,7 @@ import { useVehiculoStore } from '../store/vehiculo/vehiculoStore'
 import { useOrdenStore } from '../store/orden/ordenStore'
 import { ROUTES } from '../config/routes'
 import { formatFecha } from '../helpers/dateHelper'
+import { formatIdCorto } from '../helpers/formatHelper'
 import { ListarDaniosPorVehiculo } from '../usecases/ListarDaniosPorVehiculo'
 
 export default function DetalleVehiculo() {
@@ -130,7 +131,7 @@ export default function DetalleVehiculo() {
                   <tbody className="divide-y divide-slate-800">
                     {ordenesVehiculo.map(o => (
                       <tr key={o.id} className="hover:bg-slate-800/50">
-                        <td className="font-mono text-slate-400">{o.id}</td>
+                        <td className="font-mono text-slate-400" title={o.id}>#{formatIdCorto(o.id)}</td>
                         <td>{formatFecha(o.fechaIngreso)}</td>
                         <td><StatusBadge estado={o.estadoActual} size="sm" /></td>
                         <td className="truncate max-w-xs">{o.problemaInformado || '—'}</td>

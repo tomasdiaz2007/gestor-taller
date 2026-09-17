@@ -4,6 +4,7 @@ import { ObtenerOrden } from '../../usecases/ObtenerOrden'
 import { ActualizarEstadoOrden } from '../../usecases/ActualizarEstadoOrden'
 import { EditarOrdenTrabajo } from '../../usecases/EditarOrdenTrabajo'
 import { AgregarDanio } from '../../usecases/AgregarDanio'
+import { EditarDanio } from '../../usecases/EditarDanio'
 import { ListarDanios } from '../../usecases/ListarDanios'
 import { AgregarRepuestoAOrden } from '../../usecases/AgregarRepuestoAOrden'
 import { EliminarOrden } from '../../usecases/EliminarOrden'
@@ -94,6 +95,24 @@ export function ordenActions(set, get) {
         return danio
       } catch (err) {
         logger.error('agregarDanio', err)
+        set({ error: err.message, loading: false })
+        throw err
+      }
+    },
+
+    editarDanio: async (danioId, data) => {
+      set({ loading: true, error: null })
+      try {
+        const danio = await EditarDanio(danioId, data)
+        set((state) => ({
+          ordenActual: state.ordenActual
+            ? { ...state.ordenActual, danios: (state.ordenActual.danios || []).map((d) => (d.id === danioId ? danio : d)) }
+            : state.ordenActual,
+          loading: false,
+        }))
+        return danio
+      } catch (err) {
+        logger.error('editarDanio', err)
         set({ error: err.message, loading: false })
         throw err
       }

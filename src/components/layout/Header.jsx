@@ -35,7 +35,7 @@ export default function Header({ onMenuToggle }) {
       {/* Indicador de estado del sistema */}
       <div className="app-status">
         <span />
-        <span>Mock</span>
+        <span>Guardado local</span>
       </div>
     </header>
   )

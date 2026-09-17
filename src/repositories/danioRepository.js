@@ -1,40 +1,35 @@
-import { daniosMock } from '../mock/danios'
 import { createDanio } from '../models/Danio'
 import { NotFoundError } from '../errors/NotFoundError'
+import { createId, readCollection, writeCollection } from './localStorage'
 
-let _danios = daniosMock.map(createDanio)
-let _nextId = _danios.length + 1
+const COLLECTION = 'danios'
 
-/**
- * CONTRACT:
- * getAllByOrden(ordenId) | create(data) | delete(id)
- */
 export const danioRepository = {
-  /**
-   * @param {string} ordenId
-   * @returns {Promise<import('../types/danio').Danio[]>}
-   */
   async getAllByOrden(ordenId) {
-    return _danios.filter((d) => d.ordenTrabajoId === ordenId).map((d) => ({ ...d }))
+    return readCollection(COLLECTION)
+      .filter((danio) => danio.ordenTrabajoId === ordenId)
+      .map((danio) => ({ ...danio }))
   },
 
-  /**
-   * @param {Object} data
-   * @returns {Promise<import('../types/danio').Danio>}
-   */
   async create(data) {
-    const danio = createDanio({ ...data, id: `d${_nextId++}` })
-    _danios.push(danio)
+    const danio = createDanio({ ...data, id: createId('danio') })
+    writeCollection(COLLECTION, [...readCollection(COLLECTION), danio])
     return { ...danio }
   },
 
-  /**
-   * @param {string} id
-   * @returns {Promise<void>}
-   */
-  async delete(id) {
-    const index = _danios.findIndex((d) => d.id === id)
+  async update(id, data) {
+    const danios = readCollection(COLLECTION)
+    const index = danios.findIndex((danio) => danio.id === id)
     if (index === -1) throw new NotFoundError('Danio', id)
-    _danios.splice(index, 1)
+    const actualizado = createDanio({ ...danios[index], ...data, id })
+    danios[index] = actualizado
+    writeCollection(COLLECTION, danios)
+    return { ...actualizado }
+  },
+
+  async delete(id) {
+    const danios = readCollection(COLLECTION)
+    if (!danios.some((danio) => danio.id === id)) throw new NotFoundError('Danio', id)
+    writeCollection(COLLECTION, danios.filter((danio) => danio.id !== id))
   },
 }

@@ -88,28 +88,30 @@ export default function Vehiculos() {
                     <td>{v.modelo}</td>
                     <td className="text-slate-400">{v.año}</td>
                     <td>{v.clienteNombre}</td>
-                    <td className="text-right space-x-2">
-                      <Link 
-                        to={`/vehiculos/${v.id}`}
-                        className="p-2 text-slate-400 hover:text-blue-400 transition-colors inline-block"
-                        title="Ver detalle"
-                      >
-                        👁
-                      </Link>
-                      <Link 
-                        to={`/vehiculos/${v.id}/editar`}
-                        className="p-2 text-slate-400 hover:text-yellow-400 transition-colors inline-block"
-                        title="Editar"
-                      >
-                        ✏️
-                      </Link>
-                      <button 
-                        onClick={() => confirmDelete(v)}
-                        className="p-2 text-slate-400 hover:text-red-400 transition-colors inline-block"
-                        title="Eliminar"
-                      >
-                        🗑️
-                      </button>
+                    <td>
+                      <div className="flex items-center" style={{ gap: '1rem' }}>
+                        <Link
+                          to={`/vehiculos/${v.id}`}
+                          className="action-link"
+                          title="Ver detalle del vehículo"
+                        >
+                          Ver detalle
+                        </Link>
+                        <Link
+                          to={`/vehiculos/${v.id}/editar`}
+                          className="action-link action-link--edit"
+                          title="Editar vehículo"
+                        >
+                          Editar
+                        </Link>
+                        <button
+                          onClick={() => confirmDelete(v)}
+                          className="p-2 text-slate-400 hover:text-red-400 transition-colors inline-block"
+                          title="Eliminar"
+                        >
+                          🗑️
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}

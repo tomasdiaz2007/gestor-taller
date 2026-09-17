@@ -1,53 +1,55 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Modal from '../common/Modal'
 import Button from '../common/Button'
 import { TIPOS_DANIO } from '../../config/constants'
 
 /**
- * Modal para completar los datos de un daño después de hacer click en el diagrama.
+ * Modal para completar o editar los datos de un daño del diagrama.
  *
  * @param {{
  *   isOpen: boolean,
  *   coordenadas: { x: number, y: number } | null,
  *   vista: string,
+ *   danio?: import('../../types/danio').Danio | null,
  *   onConfirmar: (data: Object) => void,
  *   onCancelar: () => void,
  * }} props
  */
-export default function DamagePopup({ isOpen, coordenadas, vista, onConfirmar, onCancelar }) {
+export default function DamagePopup({ isOpen, coordenadas, vista, danio = null, onConfirmar, onCancelar }) {
   const [tipoDanio, setTipoDanio] = useState(TIPOS_DANIO.RAYON)
   const [descripcion, setDescripcion] = useState('')
 
+  useEffect(() => {
+    if (isOpen) {
+      setTipoDanio(danio?.tipoDanio ?? TIPOS_DANIO.RAYON)
+      setDescripcion(danio?.descripcion ?? '')
+    }
+  }, [isOpen, danio])
+
+  const esEdicion = Boolean(danio)
+
   const handleConfirmar = () => {
-    if (!coordenadas) return
+    if (!coordenadas && !esEdicion) return
     onConfirmar({
       vista,
-      coordenadaX: coordenadas.x,
-      coordenadaY: coordenadas.y,
+      coordenadaX: coordenadas?.x ?? danio.coordenadaX,
+      coordenadaY: coordenadas?.y ?? danio.coordenadaY,
       tipoDanio,
       descripcion,
     })
-    setTipoDanio(TIPOS_DANIO.RAYON)
-    setDescripcion('')
-  }
-
-  const handleCancelar = () => {
-    setTipoDanio(TIPOS_DANIO.RAYON)
-    setDescripcion('')
-    onCancelar()
   }
 
   return (
     <Modal
       isOpen={isOpen}
-      onClose={handleCancelar}
-      title="Registrar daño"
+      onClose={onCancelar}
+      title={esEdicion ? 'Editar daño' : 'Registrar daño'}
       size="sm"
       footer={
         <>
-          <Button variant="ghost" onClick={handleCancelar}>Cancelar</Button>
+          <Button variant="ghost" onClick={onCancelar}>Cancelar</Button>
           <Button onClick={handleConfirmar} variant="danger" id="btn-confirmar-danio">
-            Registrar daño
+            {esEdicion ? 'Guardar cambios' : 'Registrar daño'}
           </Button>
         </>
       }
@@ -63,21 +65,27 @@ export default function DamagePopup({ isOpen, coordenadas, vista, onConfirmar, o
 
         <div className="flex flex-col gap-1">
           <label className="text-sm font-medium text-slate-300">Tipo de daño</label>
-          <div className="grid grid-cols-2 gap-2">
-            {Object.values(TIPOS_DANIO).map((tipo) => (
-              <button
-                key={tipo}
-                type="button"
-                onClick={() => setTipoDanio(tipo)}
-                className={`px-3 py-2 rounded-lg text-xs font-medium border transition-all ${
-                  tipoDanio === tipo
-                    ? 'bg-red-600/30 border-red-600 text-red-300'
-                    : 'bg-slate-800 border-slate-700 text-slate-400 hover:border-slate-500'
-                }`}
-              >
-                {tipo}
-              </button>
-            ))}
+          <div className="grid grid-cols-2 damage-type-grid">
+            {Object.values(TIPOS_DANIO).map((tipo) => {
+              const seleccionado = tipoDanio === tipo
+              return (
+                <button
+                  key={tipo}
+                  type="button"
+                  onClick={() => setTipoDanio(tipo)}
+                  className={`damage-type-btn${seleccionado ? ' damage-type-btn--selected' : ''}`}
+                  data-tipo={tipo}
+                >
+                  <span className="damage-type-dot" aria-hidden="true" />
+                  {tipo}
+                  {seleccionado && (
+                    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                      <path d="M3 8.5 6.5 12 13 4.5" stroke="white" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  )}
+                </button>
+              )
+            })}
           </div>
         </div>
 

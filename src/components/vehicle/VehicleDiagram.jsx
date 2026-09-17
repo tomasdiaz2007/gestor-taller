@@ -18,29 +18,45 @@ const VISTA_LABELS = {
  * @param {{
  *   danios: import('../../types/danio').Danio[],
  *   onAgregarDanio: (data: Object) => Promise<void>,
+ *   onEditarDanio?: (danioId: string, data: Object) => Promise<void>,
  *   readonly?: boolean,
  * }} props
  */
-export default function VehicleDiagram({ danios = [], onAgregarDanio, readonly = false }) {
+export default function VehicleDiagram({ danios = [], onAgregarDanio, onEditarDanio, readonly = false }) {
   const [vistaActiva, setVistaActiva] = useState(VISTAS_VEHICULO.FRENTE)
   const [pendiente, setPendiente] = useState(null) // { x, y } coordenadas normalizadas
+  const [editando, setEditando] = useState(null) // daño existente a editar
   const [popupOpen, setPopupOpen] = useState(false)
 
   const handleClickSVG = (x, y) => {
     if (readonly) return
+    setEditando(null)
     setPendiente({ x, y })
     setPopupOpen(true)
   }
 
+  const handleDanioClick = (danio) => {
+    if (readonly) return
+    setPendiente(null)
+    setEditando(danio)
+    setPopupOpen(true)
+  }
+
   const handleConfirmar = async (data) => {
-    await onAgregarDanio(data)
+    if (editando && onEditarDanio) {
+      await onEditarDanio(editando.id, data)
+    } else {
+      await onAgregarDanio(data)
+    }
     setPopupOpen(false)
     setPendiente(null)
+    setEditando(null)
   }
 
   const handleCancelar = () => {
     setPopupOpen(false)
     setPendiente(null)
+    setEditando(null)
   }
 
   const daniosDeLaVista = danios.filter((d) => d.vista === vistaActiva)
@@ -77,6 +93,7 @@ export default function VehicleDiagram({ danios = [], onAgregarDanio, readonly =
         vista={vistaActiva}
         danios={danios}
         onClickSVG={handleClickSVG}
+        onDanioClick={handleDanioClick}
         readonly={readonly}
       />
 
@@ -97,11 +114,18 @@ export default function VehicleDiagram({ danios = [], onAgregarDanio, readonly =
         </div>
       )}
 
+      {!readonly && (
+        <p className="text-xs text-slate-500">
+          Hacé clic sobre el diagrama para registrar un daño, o clic sobre un marcador para editarlo
+        </p>
+      )}
+
       {/* Popup para datos del daño */}
       <DamagePopup
         isOpen={popupOpen}
         coordenadas={pendiente}
         vista={vistaActiva}
+        danio={editando}
         onConfirmar={handleConfirmar}
         onCancelar={handleCancelar}
       />

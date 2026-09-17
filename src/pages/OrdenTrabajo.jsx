@@ -10,7 +10,7 @@ import { useStockStore } from '../store/stock/stockStore'
 import { useToast } from '../components/common/ToastProvider'
 import { ESTADOS_ORDEN, TRANSICIONES_VALIDAS, ETIQUETAS_ESTADO } from '../config/status'
 import { formatFecha, calcularDiasEnTaller } from '../helpers/dateHelper'
-import { formatPrecio } from '../helpers/formatHelper'
+import { formatPrecio, formatIdCorto } from '../helpers/formatHelper'
 import { selectRepuestos } from '../store/stock/stockSelectors'
 import VehicleDiagram from '../components/vehicle/VehicleDiagram'
 
@@ -19,7 +19,7 @@ export default function OrdenTrabajo() {
   const navigate = useNavigate()
   const addToast = useToast()
 
-  const { ordenActual, loading, fetchOrdenActual, actualizarEstado, agregarDanio, agregarRepuestoAOrden } = useOrdenStore()
+  const { ordenActual, loading, fetchOrdenActual, actualizarEstado, agregarDanio, editarDanio, agregarRepuestoAOrden } = useOrdenStore()
   const { fetchVehiculoActual, vehiculoActual } = useVehiculoStore()
   const fetchRepuestos = useStockStore((s) => s.fetchRepuestos)
   const repuestos = useStockStore(selectRepuestos)
@@ -68,6 +68,15 @@ export default function OrdenTrabajo() {
     }
   }
 
+  const handleEditarDanio = async (danioId, danioData) => {
+    try {
+      await editarDanio(danioId, danioData)
+      addToast('Daño actualizado', 'success')
+    } catch (err) {
+      addToast(err.message, 'error')
+    }
+  }
+
   const handleAgregarRepuesto = async () => {
     try {
       const repuesto = repuestos.find((r) => r.id === repuestoForm.repuestoId)
@@ -91,7 +100,7 @@ export default function OrdenTrabajo() {
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-slate-100 flex items-center gap-3">
-            Orden #{ordenActual.id}
+            Orden #{formatIdCorto(ordenActual.id)}
             <StatusBadge estado={ordenActual.estadoActual} />
           </h1>
           <p className="text-sm text-slate-400 mt-1">
@@ -228,6 +237,7 @@ export default function OrdenTrabajo() {
               <VehicleDiagram
                 danios={ordenActual.danios || []}
                 onAgregarDanio={handleAgregarDanio}
+                onEditarDanio={handleEditarDanio}
                 readonly={isEntregado}
               />
             </Card>
@@ -235,7 +245,7 @@ export default function OrdenTrabajo() {
 
           {/* Repuestos utilizados */}
           <Card padding={false}>
-            <div className="px-5 py-4 border-b border-slate-700 flex items-center justify-between">
+            <div className="border-b border-slate-700 flex items-center justify-between" style={{ padding: '1rem 1.25rem' }}>
               <h2 className="text-lg font-semibold text-slate-200">Repuestos Utilizados</h2>
               {!isEntregado && (
                 <Button size="sm" onClick={() => setModalRepuesto(true)} id="btn-agregar-repuesto">
@@ -244,7 +254,7 @@ export default function OrdenTrabajo() {
               )}
             </div>
             {repuestosUsados.length === 0 ? (
-              <p className="px-5 py-8 text-sm text-slate-500 text-center">No se han registrado repuestos en esta orden.</p>
+              <p className="text-sm text-slate-500 text-center" style={{ padding: '2rem 1.25rem' }}>No se han registrado repuestos en esta orden.</p>
             ) : (
               <div className="overflow-x-auto">
                 <table className="table-base w-full text-left">

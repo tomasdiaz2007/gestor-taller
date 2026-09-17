@@ -17,9 +17,10 @@ const colorPorTipo = {
  *   danio: import('../../types/danio').Danio,
  *   svgW: number,
  *   svgH: number,
+ *   onClick?: () => void,
  * }} props
  */
-export default function DamageMarker({ danio, svgW, svgH }) {
+export default function DamageMarker({ danio, svgW, svgH, onClick }) {
   const [showTooltip, setShowTooltip] = useState(false)
   const cx = danio.coordenadaX * svgW
   const cy = danio.coordenadaY * svgH
@@ -29,6 +30,12 @@ export default function DamageMarker({ danio, svgW, svgH }) {
     <g
       onMouseEnter={() => setShowTooltip(true)}
       onMouseLeave={() => setShowTooltip(false)}
+      onClick={(e) => {
+        if (!onClick) return
+        e.stopPropagation()
+        onClick()
+      }}
+      style={onClick ? { cursor: 'pointer' } : undefined}
     >
       {/* Anillo pulsante */}
       <circle cx={cx} cy={cy} r={14} fill={color} opacity={0.15} />

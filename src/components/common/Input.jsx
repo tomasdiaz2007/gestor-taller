@@ -11,11 +11,12 @@ import React, { forwardRef } from 'react'
  *   onChange?: Function,
  *   required?: boolean,
  *   disabled?: boolean,
+ *   min?: string,
  *   className?: string,
  * }} props
  */
 const Input = forwardRef(function Input(
-  { label, error, id, type = 'text', placeholder, value, onChange, required, disabled, className = '' },
+  { label, error, id, type = 'text', placeholder, value, onChange, required, disabled, min, className = '' },
   ref
 ) {
   return (
@@ -35,6 +36,7 @@ const Input = forwardRef(function Input(
         onChange={onChange}
         required={required}
         disabled={disabled}
+        min={min}
         className={`field-input${error ? ' field-input--error' : ''} ${className}`}
       />
       {error && <p className="field-error">{error}</p>}

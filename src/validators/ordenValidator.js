@@ -32,6 +32,5 @@ export function validateTransicionEstado(estadoActual, estadoNuevo) {
 export function validateOrden(data) {
   const errors = []
   if (!data.vehiculoId) errors.push('La orden debe pertenecer a un vehículo')
-  if (!data.problemaInformado?.trim()) errors.push('El problema informado es obligatorio')
   return { valid: errors.length === 0, errors }
 }

@@ -5,9 +5,13 @@ import Button from '../components/common/Button'
 import Input from '../components/common/Input'
 import { useOrdenStore } from '../store/orden/ordenStore'
 import { useVehiculoStore } from '../store/vehiculo/vehiculoStore'
+import { AgregarDanio } from '../usecases/AgregarDanio'
 import { selectVehiculos } from '../store/vehiculo/vehiculoSelectors'
 import { useToast } from '../components/common/ToastProvider'
+import VehicleDiagram from '../components/vehicle/VehicleDiagram'
 import { ordenDetalleRoute } from '../config/routes'
+
+const hoy = () => new Date().toISOString().slice(0, 10)
 
 const initialForm = {
   vehiculoId: '',
@@ -33,6 +37,15 @@ export default function OrdenForm() {
   
   const [form, setForm] = useState(initialForm)
   const [errors, setErrors] = useState({})
+  const [daniosNuevos, setDaniosNuevos] = useState([])
+
+  const handleAgregarDanio = async (danioData) => {
+    setDaniosNuevos((prev) => [...prev, { id: crypto.randomUUID(), ...danioData }])
+  }
+
+  const handleEditarDanio = async (danioId, danioData) => {
+    setDaniosNuevos((prev) => prev.map((d) => (d.id === danioId ? { ...d, ...danioData } : d)))
+  }
 
   useEffect(() => {
     fetchVehiculos()
@@ -70,19 +83,22 @@ export default function OrdenForm() {
       setErrors({ vehiculoId: 'Debe seleccionar un vehículo' })
       return
     }
-    if (!form.problemaInformado.trim()) {
-      setErrors({ problemaInformado: 'El problema informado es requerido' })
-      return
-    }
 
     try {
-      const dataToSave = { ...form, kilometraje: Number(form.kilometraje) }
+      const dataToSave = { ...form, kilometraje: Number(form.kilometraje) || 0 }
       if (isEditing) {
         await editarOrden(id, dataToSave)
         addToast(`Orden de trabajo actualizada`, 'success')
         navigate(ordenDetalleRoute(id))
       } else {
         const orden = await crearOrden(dataToSave)
+        for (const danio of daniosNuevos) {
+          try {
+            await AgregarDanio({ ...danio, ordenTrabajoId: orden.id })
+          } catch (err) {
+            console.error('No se pudo guardar un daño', err)
+          }
+        }
         addToast(`Orden de trabajo creada`, 'success')
         navigate(ordenDetalleRoute(orden.id))
       }
@@ -128,7 +144,7 @@ export default function OrdenForm() {
 
               <div className="flex flex-col gap-1 md:col-span-2">
                 <label className="text-sm font-medium text-slate-300">
-                  Problema informado <span className="text-red-400">*</span>
+                  Problema informado
                 </label>
                 <textarea
                   rows={2}
@@ -201,6 +217,7 @@ export default function OrdenForm() {
               <Input
                 label="Fecha Prometida"
                 type="date"
+                min={hoy()}
                 value={form.fechaPrometida}
                 onChange={handleChange('fechaPrometida')}
               />
@@ -231,6 +248,20 @@ export default function OrdenForm() {
               </div>
             </div>
           </div>
+
+          {/* Daños del vehículo (solo al crear) */}
+          {!isEditing && form.vehiculoId && (
+            <div className="space-y-4">
+              <h3 className="text-sm font-medium text-slate-400 border-b border-slate-800 pb-2">
+                Daños del Vehículo
+              </h3>
+              <VehicleDiagram
+                danios={daniosNuevos}
+                onAgregarDanio={handleAgregarDanio}
+                onEditarDanio={handleEditarDanio}
+              />
+            </div>
+          )}
 
           <div className="flex justify-end gap-3 pt-4 border-t border-slate-800">
             <Button variant="ghost" onClick={() => navigate(-1)} type="button">

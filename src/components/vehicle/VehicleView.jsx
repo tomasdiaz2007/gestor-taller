@@ -32,10 +32,11 @@ function VehicleBody({ vista }) {
  *   vista: string,
  *   danios: import('../../types/danio').Danio[],
  *   onClickSVG: (x: number, y: number) => void,
+ *   onDanioClick?: (danio: import('../../types/danio').Danio) => void,
  *   readonly: boolean,
  * }} props
  */
-export default function VehicleView({ vista, danios, onClickSVG, readonly }) {
+export default function VehicleView({ vista, danios, onClickSVG, onDanioClick, readonly }) {
   const svgRef = useRef(null)
 
   const daniosDeLaVista = danios.filter((d) => d.vista === vista)
@@ -66,14 +67,10 @@ export default function VehicleView({ vista, danios, onClickSVG, readonly }) {
             danio={danio}
             svgW={SVG_W}
             svgH={SVG_H}
+            onClick={!readonly ? () => onDanioClick?.(danio) : undefined}
           />
         ))}
       </svg>
-      {!readonly && (
-        <p>
-          Hacé clic sobre el diagrama para registrar un daño
-        </p>
-      )}
     </div>
   )
 }
