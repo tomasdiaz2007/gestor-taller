@@ -54,7 +54,7 @@ export default function Sidebar({ isOpen, onNavigate }) {
             </svg>
           </div>
           <div>
-            <p>TallerGest</p>
+            <p>AutoWare</p>
             <p>Sistema de Gestión</p>
           </div>
         </div>
