@@ -102,6 +102,8 @@ export default function IngresoVehiculo() {
               label="Año"
               type="number"
               placeholder="2024"
+              min={1900}
+              max={2026}
               value={form.año}
               onChange={handleChange('año')}
               error={errors.año}
@@ -145,9 +147,15 @@ export default function IngresoVehiculo() {
               id="clienteTelefono"
               label="Teléfono"
               type="tel"
-              placeholder="12-3456-7890"
+              inputMode="numeric"
+              placeholder="Ej: 1123456789"
+              maxLength={15}
               value={form.clienteTelefono}
-              onChange={handleChange('clienteTelefono')}
+              onChange={(e) => {
+                const soloNumeros = e.target.value.replace(/\D/g, '').slice(0, 15)
+                setForm((prev) => ({ ...prev, clienteTelefono: soloNumeros }))
+                if (errors.clienteTelefono) setErrors((prev) => ({ ...prev, clienteTelefono: '' }))
+              }}
               error={errors.clienteTelefono}
               required
             />

@@ -1,7 +1,7 @@
 import React, { forwardRef } from 'react'
 
 /**
- * @param {{
+ * @param {{\
  *   label?: string,
  *   error?: string,
  *   id: string,
@@ -11,12 +11,15 @@ import React, { forwardRef } from 'react'
  *   onChange?: Function,
  *   required?: boolean,
  *   disabled?: boolean,
- *   min?: string,
+ *   min?: string | number,
+ *   max?: string | number,
+ *   maxLength?: number,
+ *   inputMode?: string,
  *   className?: string,
  * }} props
  */
 const Input = forwardRef(function Input(
-  { label, error, id, type = 'text', placeholder, value, onChange, required, disabled, min, className = '' },
+  { label, error, id, type = 'text', placeholder, value, onChange, required, disabled, className = '', ...rest },
   ref
 ) {
   return (
@@ -36,8 +39,8 @@ const Input = forwardRef(function Input(
         onChange={onChange}
         required={required}
         disabled={disabled}
-        min={min}
         className={`field-input${error ? ' field-input--error' : ''} ${className}`}
+        {...rest}
       />
       {error && <p className="field-error">{error}</p>}
     </div>

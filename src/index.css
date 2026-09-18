@@ -1,4 +1,4 @@
-:root { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color: #25303a; background: #f4f5f6; }
+﻿:root { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color: #25303a; background: #f4f5f6; }
 * { box-sizing: border-box; }
 body { margin: 0; min-width: 320px; }
 h1, h2, h3 { color: #263842; line-height: 1.25; }
@@ -181,4 +181,63 @@ svg { max-width: 100%; }
   .menu-toggle { display: block; }
   [class*="grid-cols-"] { grid-template-columns: 1fr; }
   .flex { flex-wrap: wrap; }
+  /* Fix: evita que campos del formulario se superpongan en movil */
+  .field { position: relative; z-index: 0; overflow: visible; }
+  form[class*="space-y-"] > * { position: relative; }
+}
+
+/* ============================================================
+   ESTILOS DE IMPRESION / PDF
+   ============================================================ */
+@media print {
+  /* Ocultar elementos de navegacion y acciones */
+  .sidebar,
+  .app-header,
+  .menu-toggle,
+  .toast-stack,
+  #btn-imprimir-orden,
+  #btn-agregar-repuesto,
+  .print-hide { display: none !important; }
+
+  /* Layout base */
+  body { background: #fff !important; color: #000 !important; font-size: 11pt; }
+  .app-shell { display: block !important; }
+  .app-content { width: 100% !important; }
+  .app-main { padding: 0 !important; max-width: 100% !important; }
+
+  /* Ocultar seccion de Gestion de Estado en impresion */
+  .print-no-actions { display: none !important; }
+
+  /* Cards */
+  .card { border: 1px solid #ccc !important; box-shadow: none !important; page-break-inside: avoid; margin-bottom: 12pt; background: #fff !important; }
+  .card--padded { padding: 10pt !important; }
+
+  /* Layout de columnas: apilar en impresion */
+  [class*="lg:grid-cols-3"],
+  [class*="grid-cols-3"],
+  [class*="grid-cols-2"] { grid-template-columns: 1fr !important; }
+
+  /* Colores adaptados para impresion */
+  [class*="text-slate-"],
+  [class*="text-red-"],
+  [class*="text-emerald-"] { color: #111 !important; }
+
+  h1, h2, h3, p, td, th, label, span { color: #000 !important; }
+
+  /* Botones: ocultar todos en impresion */
+  button, .button { display: none !important; }
+
+  /* Tablas */
+  table { border-collapse: collapse !important; width: 100% !important; }
+  th, td { border: 1px solid #bbb !important; padding: 5pt 8pt !important; font-size: 10pt; }
+  thead { background: #eee !important; }
+
+  /* Status badge */
+  .status-badge { border: 1px solid #888 !important; }
+
+  /* Asegurar salto de pagina entre secciones grandes */
+  .space-y-6 > * { page-break-inside: avoid; }
+
+  /* Titulo de la orden visible */
+  h1 { font-size: 16pt !important; margin-bottom: 8pt !important; }
 }

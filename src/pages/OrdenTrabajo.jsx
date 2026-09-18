@@ -111,6 +111,9 @@ export default function OrdenTrabajo() {
           <Button variant="ghost" onClick={() => navigate('/ordenes')}>
             Volver
           </Button>
+          <Button variant="ghost" onClick={() => window.print()} id="btn-imprimir-orden">
+            📄 Descargar PDF
+          </Button>
           {!isEntregado && (
             <Button onClick={() => navigate(`/ordenes/${id}/editar`)}>
               Editar Orden
@@ -179,7 +182,7 @@ export default function OrdenTrabajo() {
           </Card>
 
           {/* Acciones de estado */}
-          <Card>
+          <Card className="print-no-actions">
             <h2 className="text-lg font-semibold text-slate-200 mb-4 border-b border-slate-700 pb-2">Gestión de Estado</h2>
             {isEntregado ? (
               <p className="text-sm text-slate-500">Esta orden está entregada y es inmutable.</p>
