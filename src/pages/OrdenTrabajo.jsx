@@ -98,7 +98,7 @@ export default function OrdenTrabajo() {
     <div className="space-y-6 animate-fade-in max-w-5xl mx-auto">
       {/* Header info */}
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-        <div>
+        <div className="print-header">
           <h1 className="text-2xl font-bold text-slate-100 flex items-center gap-3">
             Orden #{formatIdCorto(ordenActual.id)}
             <StatusBadge estado={ordenActual.estadoActual} />
@@ -107,7 +107,7 @@ export default function OrdenTrabajo() {
             Ingreso: {formatFecha(ordenActual.fechaIngreso)} · {calcularDiasEnTaller(ordenActual.fechaIngreso)} días en taller
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 print-hide">
           <Button variant="ghost" onClick={() => navigate('/ordenes')}>
             Volver
           </Button>
@@ -122,7 +122,7 @@ export default function OrdenTrabajo() {
         </div>
       </div>
 
-      <div className="grid lg:grid-cols-3 gap-6">
+      <div className="grid lg:grid-cols-3 gap-6 print-layout-orden">
         {/* Columna Izquierda: Datos */}
         <div className="lg:col-span-1 space-y-6">
           <Card>
@@ -233,9 +233,9 @@ export default function OrdenTrabajo() {
             </div>
           </Card>
 
-          {/* Diagrama de daños */}
+          {/* Diagrama de daños — visible solo en pantalla */}
           {!isEntregado && (
-            <Card>
+            <Card className="print-hide">
               <h2 className="text-lg font-semibold text-slate-200 mb-4 border-b border-slate-700 pb-2">Daños Registrados</h2>
               <VehicleDiagram
                 danios={ordenActual.danios || []}
@@ -244,6 +244,31 @@ export default function OrdenTrabajo() {
                 readonly={isEntregado}
               />
             </Card>
+          )}
+
+          {/* Daños — visible solo al imprimir (listado textual sin gráfico) */}
+          {(ordenActual.danios?.length > 0) && (
+            <div className="print-only">
+              <h2 className="print-section-title">Daños Registrados</h2>
+              <table className="print-danios-table">
+                <thead>
+                  <tr>
+                    <th>Vista</th>
+                    <th>Tipo</th>
+                    <th>Descripción</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {ordenActual.danios.map((d, i) => (
+                    <tr key={d.id ?? i}>
+                      <td>{d.vista}</td>
+                      <td>{d.tipoDanio}</td>
+                      <td>{d.descripcion || '—'}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
 
           {/* Repuestos utilizados */}

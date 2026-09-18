@@ -1,4 +1,4 @@
-﻿:root { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color: #25303a; background: #f4f5f6; }
+:root { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color: #25303a; background: #f4f5f6; }
 * { box-sizing: border-box; }
 body { margin: 0; min-width: 320px; }
 h1, h2, h3 { color: #263842; line-height: 1.25; }
@@ -186,58 +186,108 @@ svg { max-width: 100%; }
   form[class*="space-y-"] > * { position: relative; }
 }
 
+
 /* ============================================================
    ESTILOS DE IMPRESION / PDF
    ============================================================ */
+
+/* Secciones solo visibles al imprimir */
+.print-only { display: none; }
+
 @media print {
-  /* Ocultar elementos de navegacion y acciones */
+  /* --- Reset de navegacion y shell --- */
   .sidebar,
   .app-header,
   .menu-toggle,
   .toast-stack,
-  #btn-imprimir-orden,
-  #btn-agregar-repuesto,
-  .print-hide { display: none !important; }
+  .print-hide,
+  .print-no-actions { display: none !important; }
 
-  /* Layout base */
-  body { background: #fff !important; color: #000 !important; font-size: 11pt; }
+  /* Secciones solo para impresion */
+  .print-only { display: block !important; }
+
+  /* --- Layout base --- */
+  @page { size: A4; margin: 1.5cm 1.8cm; }
+  body { background: #fff !important; color: #111 !important; font-size: 10pt; font-family: system-ui, sans-serif; }
   .app-shell { display: block !important; }
   .app-content { width: 100% !important; }
   .app-main { padding: 0 !important; max-width: 100% !important; }
 
-  /* Ocultar seccion de Gestion de Estado en impresion */
-  .print-no-actions { display: none !important; }
+  /* --- Header de la orden --- */
+  .print-header { margin-bottom: 0.4cm; }
+  .print-header h1 { font-size: 14pt !important; margin: 0 0 2pt !important; color: #000 !important; }
+  .print-header p { font-size: 9pt !important; color: #444 !important; margin: 0 !important; }
 
-  /* Cards */
-  .card { border: 1px solid #ccc !important; box-shadow: none !important; page-break-inside: avoid; margin-bottom: 12pt; background: #fff !important; }
-  .card--padded { padding: 10pt !important; }
+  /* --- Cards --- */
+  .card {
+    border: 1px solid #ccc !important;
+    box-shadow: none !important;
+    background: #fff !important;
+    page-break-inside: avoid;
+    margin-bottom: 0.3cm;
+    border-radius: 4px !important;
+  }
+  .card--padded { padding: 0.3cm 0.4cm !important; }
 
-  /* Layout de columnas: apilar en impresion */
-  [class*="lg:grid-cols-3"],
+  /* --- Forzar 1 columna en los grids de contenido internos --- */
   [class*="grid-cols-3"],
   [class*="grid-cols-2"] { grid-template-columns: 1fr !important; }
 
-  /* Colores adaptados para impresion */
+  /* --- El grid principal de la orden: 2 columnas compactas (debe ir despues para ganar en cascada) --- */
+  .print-layout-orden {
+    display: grid !important;
+    grid-template-columns: 42% 55% !important;
+    gap: 0.5cm !important;
+    align-items: start !important;
+  }
+  .print-layout-orden > div:first-child { grid-column: 1 !important; }
+  .print-layout-orden > div:last-child  { grid-column: 2 !important; }
+
+
+  /* --- Colores y tipografia --- */
   [class*="text-slate-"],
   [class*="text-red-"],
   [class*="text-emerald-"] { color: #111 !important; }
+  h1, h2, h3, p, td, th, label, span, div { color: #111 !important; }
+  h2 { font-size: 10pt !important; margin: 0 0 0.15cm !important; }
 
-  h1, h2, h3, p, td, th, label, span { color: #000 !important; }
-
-  /* Botones: ocultar todos en impresion */
+  /* --- Ocultar todos los botones --- */
   button, .button { display: none !important; }
 
-  /* Tablas */
+  /* --- Fondos oscuros → blanco --- */
+  [class*="bg-slate-"],
+  [class*="bg-blue-"] { background: #f8f8f8 !important; }
+
+  /* --- Tablas generales --- */
   table { border-collapse: collapse !important; width: 100% !important; }
-  th, td { border: 1px solid #bbb !important; padding: 5pt 8pt !important; font-size: 10pt; }
+  th, td { border: 1px solid #ccc !important; padding: 3pt 6pt !important; font-size: 9pt !important; color: #111 !important; }
   thead { background: #eee !important; }
+  .table-base { min-width: unset !important; }
 
-  /* Status badge */
-  .status-badge { border: 1px solid #888 !important; }
+  /* --- Status badge --- */
+  .status-badge { border: 1px solid #888 !important; padding: 1pt 4pt !important; font-size: 8pt !important; }
 
-  /* Asegurar salto de pagina entre secciones grandes */
-  .space-y-6 > * { page-break-inside: avoid; }
+  /* --- Texto de diagnostico --- */
+  [class*="whitespace-pre-wrap"] { white-space: pre-wrap; }
 
-  /* Titulo de la orden visible */
-  h1 { font-size: 16pt !important; margin-bottom: 8pt !important; }
+  /* --- Seccion de danos (print-only) --- */
+  .print-section-title {
+    font-size: 10pt !important;
+    font-weight: 700;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 3pt;
+    margin: 0 0 0.2cm !important;
+    color: #111 !important;
+  }
+  .print-danios-table { width: 100%; border-collapse: collapse; margin-top: 4pt; }
+  .print-danios-table th,
+  .print-danios-table td { border: 1px solid #ccc; padding: 3pt 6pt; font-size: 9pt; text-align: left; color: #111 !important; }
+  .print-danios-table thead { background: #eee; }
+  .print-only { border: 1px solid #ccc; border-radius: 4px; padding: 0.3cm 0.4cm; margin-bottom: 0.3cm; page-break-inside: avoid; }
+
+  /* --- Espaciado entre secciones --- */
+  .space-y-6 > * + * { margin-top: 0.3cm !important; }
+  .space-y-3 > * + * { margin-top: 0.15cm !important; }
+  .space-y-4 > * + * { margin-top: 0.2cm !important; }
+  .mb-4 { margin-bottom: 0.15cm !important; }
 }
