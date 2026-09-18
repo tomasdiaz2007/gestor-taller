@@ -98,18 +98,6 @@ export default function IngresoVehiculo() {
               required
             />
             <Input
-              id="año"
-              label="Año"
-              type="number"
-              placeholder="2024"
-              min={1900}
-              max={2026}
-              value={form.año}
-              onChange={handleChange('año')}
-              error={errors.año}
-              required
-            />
-            <Input
               id="marca"
               label="Marca"
               placeholder="Marca del vehículo"
@@ -125,6 +113,23 @@ export default function IngresoVehiculo() {
               value={form.modelo}
               onChange={handleChange('modelo')}
               error={errors.modelo}
+              required
+            />
+            <Input
+              id="año"
+              label="Año"
+              type="text"
+              inputMode="numeric"
+              pattern="[0-9]*"
+              placeholder="2024"
+              maxLength={4}
+              value={form.año}
+              onChange={(e) => {
+                const soloNumeros = e.target.value.replace(/\D/g, '').slice(0, 4)
+                setForm((prev) => ({ ...prev, año: soloNumeros }))
+                if (errors.año) setErrors((prev) => ({ ...prev, año: '' }))
+              }}
+              error={errors.año}
               required
             />
           </div>
